@@ -19,7 +19,7 @@ namespace MultiThreading.Task3.MatrixMultiplier.Multipliers
 
                     resultMatrix.SetElement(i, j, sum);
                 }
-            };
+            }
 
             return resultMatrix;
         }

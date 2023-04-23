@@ -9,18 +9,12 @@ namespace MultiThreading.Task3.MatrixMultiplier.Matrices
     public sealed class Matrix : IMatrix
     {
         private const byte RandomMax = 100;
-
         private const byte MaxPrintElements = 5;
-
-        private readonly long[,] _matrix;
-
-        #region public properties
+        private readonly long[,] matrix;
 
         public long RowCount { get; }
 
         public long ColCount { get; }
-
-        #endregion
 
         public Matrix(long rows, long cols, bool randomInit = false)
         {
@@ -29,10 +23,10 @@ namespace MultiThreading.Task3.MatrixMultiplier.Matrices
                 throw new ArgumentException($"The matrix should have at least 1 row and 1 column");
             }
 
-            RowCount = rows;
-            ColCount = cols;
+            this.RowCount = rows;
+            this.ColCount = cols;
 
-            _matrix = new long[RowCount, ColCount];
+            this.matrix = new long[this.RowCount, this.ColCount];
             Initialize();
 
             void Initialize()
@@ -40,32 +34,30 @@ namespace MultiThreading.Task3.MatrixMultiplier.Matrices
                 if (randomInit)
                 {
                     var r = new Random();
-                    for (var i = 0; i < RowCount; i++)
+                    for (var i = 0; i < this.RowCount; i++)
                     {
-                        for (var j = 0; j < ColCount; j++)
+                        for (var j = 0; j < this.ColCount; j++)
                         {
-                            _matrix[i, j] = r.Next(RandomMax);
+                            this.matrix[i, j] = r.Next(RandomMax);
                         }
                     }
                 }
             }
         }
 
-        #region public methods
-
         public void SetElement(long row, long col, long value)
         {
-            _matrix[row, col] = value;
+            this.matrix[row, col] = value;
         }
 
         public long GetElement(long row, long col)
         {
-            return _matrix[row, col];
+            return this.matrix[row, col];
         }
 
-        public void Print()
+        public void Write()
         {
-            for (long r = 0; r < RowCount; r++)
+            for (long r = 0; r < this.RowCount; r++)
             {
                 if (r >= MaxPrintElements)
                 {
@@ -74,7 +66,7 @@ namespace MultiThreading.Task3.MatrixMultiplier.Matrices
                 }
 
                 var sb = new StringBuilder();
-                for (long c = 0; c < ColCount; c++)
+                for (long c = 0; c < this.ColCount; c++)
                 {
                     if (c >= MaxPrintElements)
                     {
@@ -88,7 +80,5 @@ namespace MultiThreading.Task3.MatrixMultiplier.Matrices
                 Console.WriteLine(sb.ToString());
             }
         }
-
-        #endregion
     }
 }

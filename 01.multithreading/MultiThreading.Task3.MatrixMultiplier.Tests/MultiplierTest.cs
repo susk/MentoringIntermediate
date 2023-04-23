@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MultiThreading.Task3.MatrixMultiplier.Matrices;
 using MultiThreading.Task3.MatrixMultiplier.Multipliers;
@@ -11,8 +12,8 @@ namespace MultiThreading.Task3.MatrixMultiplier.Tests
         [TestMethod]
         public void MultiplyMatrix3On3Test()
         {
-            TestMatrix3On3(new MatricesMultiplier());
-            TestMatrix3On3(new MatricesMultiplierParallel());
+            this.TestMatrix3On3(new MatricesMultiplier());
+            this.TestMatrix3On3(new MatricesMultiplierParallel());
         }
 
         [TestMethod]
@@ -20,11 +21,22 @@ namespace MultiThreading.Task3.MatrixMultiplier.Tests
         {
             // todo: implement a test method to check the size of the matrix which makes parallel multiplication more effective than
             // todo: the regular one
+            byte size = 250;
+            bool pass = false;
+
+            for (byte i = 1; i <= size; i++)
+            {
+                if (this.TestMatrixSize(i))
+                {
+                    pass = true;
+                    break;
+                }
+            }
+
+            Assert.AreEqual(pass, true);
         }
 
-        #region private methods
-
-        void TestMatrix3On3(IMatricesMultiplier matrixMultiplier)
+        private void TestMatrix3On3(IMatricesMultiplier matrixMultiplier)
         {
             if (matrixMultiplier == null)
             {
@@ -71,6 +83,35 @@ namespace MultiThreading.Task3.MatrixMultiplier.Tests
             Assert.AreEqual(728, multiplied.GetElement(2, 2));
         }
 
-        #endregion
+        private bool TestMatrixSize(byte size)
+        {
+            var m1 = new Matrix(size, size, true);
+            var m2 = new Matrix(size, size, true);
+
+            Stopwatch stopwatch = new Stopwatch();
+
+            // regular
+            var matrixMultiplier = new MatricesMultiplier();
+            stopwatch.Start();
+            var multiplied = matrixMultiplier.Multiply(m1, m2);
+            stopwatch.Stop();
+            TimeSpan tsRegular = stopwatch.Elapsed;
+
+            // parallel
+            var matrixMultiplierParallel = new MatricesMultiplierParallel();
+            stopwatch.Reset();
+            stopwatch.Start();
+            matrixMultiplierParallel.Multiply(m1, m2);
+            stopwatch.Stop();
+            TimeSpan tsParallel = stopwatch.Elapsed;
+
+            if (tsParallel >= tsRegular)
+            {
+                return false;
+            }
+
+            Trace.WriteLine($"size is: {size}");
+            return true;
+        }
     }
 }
