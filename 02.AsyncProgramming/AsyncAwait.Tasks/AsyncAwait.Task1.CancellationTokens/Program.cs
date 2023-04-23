@@ -8,15 +8,20 @@
 */
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AsyncAwait.Task1.CancellationTokens;
 
 internal class Program
 {
+    private static CancellationTokenSource cts = new CancellationTokenSource();
+    private static Task calcTask;
+
     /// <summary>
     /// The Main method should not be changed at all.
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="args">args.</param>
     private static void Main(string[] args)
     {
         Console.WriteLine("Mentoring program L2. Async/await.V1. Task 1");
@@ -27,6 +32,8 @@ internal class Program
         Console.WriteLine("Enter N: ");
 
         var input = Console.ReadLine();
+        Task calcTask = null;
+
         while (input.Trim().ToUpper() != "Q")
         {
             if (int.TryParse(input, out var n))
@@ -46,16 +53,30 @@ internal class Program
         Console.ReadLine();
     }
 
-    private static void CalculateSum(int n)
+    private static async Task CalculateSum(int n)
     {
-        // todo: make calculation asynchronous
-        var sum = Calculator.Calculate(n);
-        Console.WriteLine($"Sum for {n} = {sum}.");
-        Console.WriteLine();
-        Console.WriteLine("Enter N: ");
-        // todo: add code to process cancellation and uncomment this line    
-        // Console.WriteLine($"Sum for {n} cancelled...");
-
         Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
+
+        cts.Cancel();
+        if (calcTask != null)
+        {
+            await calcTask;
+        }
+
+        cts.Dispose();
+        cts = new CancellationTokenSource();
+
+        calcTask = Calculator.CalculateAsync(n, cts.Token)
+            .ContinueWith(parentTask =>
+            {
+                if (parentTask.IsCanceled)
+                {
+                    Console.WriteLine($"The task is cancelled...");
+                }
+                else
+                {
+                    Console.WriteLine($"Sum for {n} = {parentTask.Result}.");
+                }
+            });
     }
 }

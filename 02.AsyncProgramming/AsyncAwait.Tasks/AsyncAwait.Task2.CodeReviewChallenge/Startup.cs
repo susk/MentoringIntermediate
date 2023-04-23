@@ -15,7 +15,7 @@ public class Startup
 {
     public Startup(IConfiguration configuration)
     {
-        Configuration = configuration;
+        this.Configuration = configuration;
     }
 
     public IConfiguration Configuration { get; }
@@ -42,7 +42,10 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (false && env.IsDevelopment())
+        {
             app.UseDeveloperExceptionPage();
+        }
+
         app.UseExceptionHandler("/Home/Error");
 
         app.UseStatistic();
